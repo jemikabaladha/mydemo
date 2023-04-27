@@ -1,10 +1,10 @@
 .htaccess
 .env
-# assets/uploads/*
-# !assets/uploads/index.html
-# api_log*
-# worker/*
-# !worker/index.html
+assets/uploads/*
+!assets/uploads/index.html
+api_log*
+worker/*
+!worker/index.html
 
 #----- (Custom changes) -
 composer.lock
