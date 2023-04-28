@@ -52,7 +52,7 @@ class Login extends MY_Controller {
                 $sessionData = array(
                     'role' => $user->role,
                     'adminId' => $user->id,
-                    'adminImage' => $user->image,
+                    'adminImage' => $user->profileImage,
                     'adminname' => $user->fullName,
                 );
                 $this->session->set_userdata($sessionData);

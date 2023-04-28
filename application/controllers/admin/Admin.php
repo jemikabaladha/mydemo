@@ -60,35 +60,37 @@ class Admin extends MY_Controller {
             $upload_path = getenv('UPLOADPATH');
             //$allowed_types = array(".jpg", ".png", ".jpeg",".webp");          
             $allowed_types = array(".jpg",".JPG",".jpeg",".JPEG",".png",".PNG",".webp");           
-            if (isset($_FILES['image']["name"]) && !empty($_FILES['image']["name"])) {
-                $fileExt = strtolower($this->Common_Model->getFileExtension($_FILES['image']["name"]));
+            if (isset($_FILES['profileImage']["name"]) && !empty($_FILES['profileImage']["name"])) {
+                $fileExt = strtolower($this->Common_Model->getFileExtension($_FILES['profileImage']["name"]));
                 if (in_array($fileExt, $allowed_types)) {
                     $fileName = date('ymdhis') . $this->Common_Model->random_string(6) . $fileExt;
                     $upload_dir = $upload_path . "/" . $fileName;
-                    if (move_uploaded_file($_FILES['image']["tmp_name"], $upload_dir)) {
-                        $data['image'] = $fileName;
+                    if (move_uploaded_file($_FILES['profileImage']["tmp_name"], $upload_dir)) {
+                        $data['profileImage'] = $fileName;
                     }
                 }else{
-                    $data['image'] = "default_user.jpg";
+                    $data['profileImage'] = "default_user.jpg";
                 }
             }
 
 
-            $setData['fullName'] = $data['fullName'];
+            $setData['firstName'] = $data['firstName'];
+            $setData['lastName'] = isset($data['lastName']) && !empty($data['lastName']) ? $data['lastName'] : "";
             // $setData['username'] = $data['username'];
             $setData['email'] = $data['email'];
             $setData['phone'] = $data['phone'];
     
-            if(isset($data['image']) && !empty($data['image'])){
-                $setData['image'] = $data['image'];
+            if(isset($data['profileImage']) && !empty($data['profileImage'])){
+                $setData['profileImage'] = $data['profileImage'];
             }
             if (isset($data['id']) && !empty($data['id'])) {
                 $this->Users_Model->setData($setData, $data['id']);
                 $sessionData = array(
-                    'adminRole' => $this->session->userdata('adminRole'),
+                    // 'adminRole' => $this->session->userdata('adminRole'),
+                    'role' => $this->session->userdata('role'),
                     'adminId' => $data['id'],
-                    'adminImage' => isset($data['image']) && !empty($data['image']) ? $data['image'] : $this->data['data']->image,
-                    'username' => $data['fullName'],
+                    'adminImage' => isset($data['profileImage']) && !empty($data['profileImage']) ? base_url(getenv('UPLOADPATH') . $data['profileImage']) : $this->data['data']->profileImage,
+                    'adminname' => isset($data['firstName']) ? ucwords($data['firstName']) . (isset($data['lastName']) && !empty($data['lastName']) ? "" . ucwords($data['lastName']) : "") : "",
                 );
                 $this->session->set_userdata($sessionData);
                 $this->session->set_flashdata('success', 'Profile saved');

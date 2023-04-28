@@ -63,7 +63,7 @@
       <div class="sidebar-wrapper" id="sidebar-wrapper">
         <div class="user">
           <div class="photo">
-            <img src="<?php echo base_url()."assets/uploads/".$this->session->userdata('adminImage');?>" onerror='this.onerror=null;this.src="<?php echo base_url("assets/img/default_user.jpg"); ?>";'/>
+            <img src="<?php echo $this->session->userdata('adminImage');?>" onerror='this.onerror=null;this.src="<?php echo base_url("assets/img/default_user.jpg"); ?>";'/>
           </div>
           <div class="info">
             <a data-toggle="collapse" href="#collapseExample" class="collapsed">

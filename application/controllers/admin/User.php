@@ -8,7 +8,7 @@ class User extends MY_Controller {
         parent::__construct();
         $this->load->model('Common_Model');
         $this->load->model('Users_Model');
-        $this->load->model('Background_Model');
+        // $this->load->model('Background_Model');
         $this->Common_Model->checkUserAuth(1);
         $this->template->set_template('AdminTemplate');
         $this->data['page'] = ['name'=>"User",'url'=>base_url('admin/user'),'menu'=>'user','submenu'=>''];
@@ -41,7 +41,7 @@ class User extends MY_Controller {
                         $fileName = date('ymdhis') . $this->Common_Model->random_string(6) . $fileExt;
                         $upload_dir = $upload_path . "/" . $fileName;
                         if (move_uploaded_file($_FILES['image']["tmp_name"], $upload_dir)) {
-                            $data['image'] = $fileName;
+                            $data['profileImage'] = $fileName;
                         }
                     }else{
                         $this->session->set_flashdata('error', 'Allowed only image file.');
@@ -49,34 +49,6 @@ class User extends MY_Controller {
                     }
                 }
                 //image upload
-
-                if (isset($data['isCosmetologist']) && $data['isCosmetologist']=="1") {
-                    //license upload
-                    $upload_path2 = getenv('UPLOADPATH');
-                    //$allowed_types2 = array(".jpg", ".png", ".jpeg",".webp");   
-                    $allowed_types2 = array(".jpg",".JPG",".jpeg",".JPEG",".png",".PNG",".webp");         
-                    if (isset($_FILES['licenseImage']["name"]) && !empty($_FILES['licenseImage']["name"])) {
-                        $fileExt2 = strtolower($this->Common_Model->getFileExtension($_FILES['licenseImage']["name"]));
-                        if (in_array($fileExt2, $allowed_types2)) {
-                            $fileName2 = date('ymdhis') . $this->Common_Model->random_string(6) . $fileExt2;
-                            $upload_dir2 = $upload_path2 . "/" . $fileName2;
-                            if (move_uploaded_file($_FILES['licenseImage']["tmp_name"], $upload_dir2)) {
-                                $data['licenseImage'] = $fileName2;
-                            }
-                        }else{
-                            $this->session->set_flashdata('error', 'Allowed only image file.');
-                            return redirect('admin/user' . $data['id']);
-                        }
-                    }
-                    //license upload
-                    $data['licenseDate'] = isset($data['licenseDate']) && !empty($data['licenseDate']) ? strtotime($data['licenseDate']) : "";
-
-                } else {
-                    $data['cosmetologyLicenseNumber'] = "";
-                    $data['licenseDate'] = "";
-                    $data['licenseStateId'] = "";
-                    $data['licenseImage'] = "";
-                }
 
                 if (isset($data['password']) && !empty($data['password'])) {
                     $data['password'] = $this->Common_Model->convert_to_hash($data['password']);
@@ -130,12 +102,12 @@ class User extends MY_Controller {
             $userStatus = "";
             if($value->status==0){$userStatus = "Need to Verify";}elseif($value->status==1){$userStatus = "Active";}elseif($value->status==2){$userStatus = "Admin Blocked";}
             $onerror=base_url('assets/uploads/default_user.jpg');
-            $result['data'][$key][] = "<div class='profiletable'><img src=".$value->thumbprofileimage." alt=". $value->fullName." onerror=\"this.onerror=null;this.src='".$onerror."';\"><span>".$value->fullName."</span></div>"; 
-            // $result['data'][$key][] = "<div class='profiletable'><img src=".$value->thumbprofileimage." alt=". $value->fullName." onerror=\"this.onerror=null;this.src='".$onerror."';\"></div>"; 
+            $result['data'][$key][] = "<div class='profiletable'><img src='".$value->thumbProfileImage."' alt='". $value->fullName."' onerror=\"this.onerror=null;this.src='".$onerror."';\"><span>".$value->fullName."</span></div>";
+            // $result['data'][$key][] = "<div class='profiletable'><img src=".$value->thumbProfileImage." alt=". $value->fullName." onerror=\"this.onerror=null;this.src='".$onerror."';\"></div>"; 
             // $result['data'][$key][] = isset($value->firstName) && !empty($value->firstName) ? $value->firstName : "-";
             // $result['data'][$key][] = isset($value->lastName) && !empty($value->lastName) ? $value->lastName : "-";
             $result['data'][$key][] = isset($value->email) && !empty($value->email) ? $value->email : "-";
-            $result['data'][$key][] = isset($value->phone) && !empty($value->phone) ? (isset($value->phone_code) && !empty($value->phone_code) ? "+".$value->phone_code . " " . $value->phone : $value->phone) : "-";
+            $result['data'][$key][] = isset($value->phone) && !empty($value->phone) ? (isset($value->phoneCode) && !empty($value->phoneCode) ? "+".$value->phoneCode . " " . $value->phone : $value->phone) : "-";
             $result['data'][$key][] = $userStatus;
             $result['data'][$key][] = $value->createdDate;
             $result['data'][$key][] = $status.' <a href="' . current_url() . "/set/" . $value->id . '" class="btn btn-round btn-info btn-icon btn-sm"><i class="fas fa-pencil-alt"></i></a>
@@ -153,7 +125,6 @@ class User extends MY_Controller {
     public function view($id = 0) {     
         $data['status'] = [0,1,2];
         $data['id'] = $this->data['id'] = $id;
-        // $this->data['orderdetail'] = $this->OrderDetails_Model->get(['userId'=>$id,'status'=>[0,1]]);
         $this->data['data'] =  $this->Users_Model->get($data,TRUE);
         
         if(empty($this->data['data']))
@@ -207,6 +178,17 @@ class User extends MY_Controller {
         return redirect('admin/user');
     }
 
+    public function checkPhoneExist($id=0) {
+        $data = $this->input->post();
+        $exist = $this->Users_Model->get(['phone'=>$data['phone'],'role'=>$data['role'],'id'=>$id,'notInclude'=>TRUE], true);
+        if ($exist) {
+            echo "0";
+        } else {
+            echo "true";
+        }
+        // return false;
+    }
+
     public function actionExport() {
         $this->load->library("PhpSpreadsheet");
         $object = $this->phpspreadsheet->phpExcel();
@@ -240,7 +222,7 @@ class User extends MY_Controller {
             $userStatus = "";
             if($row->status==0){$userStatus = "Need to Verify";}elseif($row->status==1){$userStatus = "Active";}elseif($row->status==2){$userStatus = "Admin Blocked";}
             $email = isset($row->email) && !empty($row->email) ? $row->email : "-";
-            $phone = isset($row->phone) && !empty($row->phone) ? (isset($row->phone_code) && !empty($row->phone_code) ? "+".$row->phone_code . " " . $row->phone : $row->phone) : "-";
+            $phone = isset($row->phone) && !empty($row->phone) ? (isset($row->phoneCode) && !empty($row->phoneCode) ? "+".$row->phoneCode . " " . $row->phone : $row->phone) : "-";
             
             $object->getActiveSheet()->setCellValueByColumnAndRow(1, $excel_row, $row->fullName);
             $object->getActiveSheet()->setCellValueByColumnAndRow(2, $excel_row, $email);

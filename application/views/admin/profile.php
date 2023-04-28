@@ -6,8 +6,7 @@
             </div>
             
             <div class="card-body">         
-				
-				<section id="tabs" class="project-tab">																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																		
+				<section id="tabs" class="project-tab">
 					<div class="container ml-0 px-0">
 						<div class="row">
 							<div class="col-md-12">
@@ -26,8 +25,14 @@
 													<div class="row">
 														<div class="col-sm-6">
 															<div class="form__group">
-																<label class="form__label" for="name">Name*</label>
-																<input class="form__field" type="text"  id="name"  name="fullName" placeholder="Name*"  value="<?php echo isset($data->fullName)?$data->fullName:"" ?>" >
+																<label class="form__label" for="name">First Name*</label>
+																<input class="form__field" type="text"  id="firstName"  name="firstName" placeholder="First Name*"  value="<?php echo isset($data->firstName)?$data->firstName:"" ?>" >
+															</div>
+														</div>
+														<div class="col-sm-6">
+															<div class="form__group">
+																<label class="form__label" for="name">Last Name*</label>
+																<input class="form__field" type="text"  id="lastName"  name="lastName" placeholder="Last Name"  value="<?php echo isset($data->lastName)?$data->lastName:"" ?>" >
 															</div>
 														</div>
 														<div class="col-sm-6">
@@ -38,7 +43,7 @@
 														</div>
 														<div class="col-sm-6">
 															<div class="form__group">
-																<label class="form__label" for="lastName">Mobile Number*</label>
+																<label class="form__label" for="phone">Mobile Number*</label>
 																<input class="form__field" type="text"  id="phone"  name="phone" placeholder="Mobile Number*"  value="<?php echo isset($data->phone)?$data->phone:"" ?>" >
 															</div>
 														</div>
@@ -48,14 +53,14 @@
 												</div>
 												<div class="col-md-4 d-flex justify-content-center"> 
 														<input type="hidden" id="id" name="id" value="<?php echo isset($data->id)?$data->id:"" ?>">
-														<div class="position-relative fileinput  <?= isset($data->image) && !empty($data->image) ? "fileinput-exists" : "fileinput-new"; ?> text-center" data-provides="fileinput">
+														<div class="position-relative fileinput  <?= isset($data->profileImage) && !empty($data->profileImage) ? "fileinput-exists" : "fileinput-new"; ?> text-center" data-provides="fileinput">
 															<div class="fileinput-new thumbnail">
 																<img src="<?php echo base_url('assets/uploads/default_user.jpg'); ?>" alt="...">
 															</div>
 															<div class="fileinput-preview fileinput-exists thumbnail position-relative text-center">
-																<?php if(isset($data->image) && !empty($data->image)){
+																<?php if(isset($data->profileImage) && !empty($data->profileImage)){
 																	?>
-																		<img src="<?php echo base_url()."assets/uploads/".$data->image; ?>" alt="...">
+																		<img src="<?php echo $data->profileImage; ?>" onerror='this.onerror=null;this.src="<?php echo base_url("assets/img/default_user.jpg"); ?>";' alt="...">
 																	<?php
 																}?>
 																
@@ -63,7 +68,7 @@
 															<div>
 																<span class="btn btn-rose btn-round btn-file upload-icon">
 																	<span class="fileinput-exists"><i class="fa fa-arrow-up"></i></span>
-																	<input type="file" name="image" />
+																	<input type="file" name="profileImage" />
 																</span>
 															</div>
 														</div>
@@ -110,7 +115,7 @@
 <script>
 	$("#form").validate({
 		rules: {
-			fullName: {
+			firstName: {
 				required: true,
 				normalizer: function(value) {
 					return $.trim(value);
@@ -132,8 +137,8 @@
 			
 		},
 		messages: {
-            fullName: {
-				required: "Please enter full name",
+            firstName: {
+				required: "Please enter first name",
 			},
 			email: {
                 email: "Please enter valid email address",
